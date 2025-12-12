@@ -1,104 +1,284 @@
-/* src/App.css */
+/* App.css - Styling cho Document Reader */
 
-/* 1. Căn giữa trang web và font chữ dễ đọc */
-body {
-  background-color: #f0f2f5; /* Màu nền xám nhẹ */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  display: flex;
-  justify-content: center;
-  padding-top: 50px;
+* {
   margin: 0;
-}
-
-/* 2. Cái khung chứa Todo App (giống cái thẻ bài) */
-.todo-app {
-  background: white;
-  width: 100%;
-  max-width: 500px; /* Không cho rộng quá */
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ cho nổi */
-}
-
-h1 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
-  font-size: 24px;
-}
-
-/* 3. Khu vực nhập liệu (Input + Nút thêm) */
-.input-group {
-  display: flex;
-  gap: 10px; /* Khoảng cách giữa input và nút */
-  margin-bottom: 25px;
-}
-
-.input-field {
-  flex: 1; /* Input chiếm hết chỗ trống còn lại */
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 16px;
-  outline: none;
-}
-
-.input-field:focus {
-  border-color: #4a90e2; /* Đổi màu viền khi bấm vào */
-}
-
-/* 4. Danh sách công việc */
-.todo-list {
-  list-style: none;
   padding: 0;
-  margin: 0;
+  box-sizing: border-box;
 }
 
-.todo-item {
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px 20px;
+}
+
+header {
+  text-align: center;
+  color: white;
+  margin-bottom: 40px;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* File Uploader */
+.file-uploader {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.file-uploader h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.file-uploader input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  border: 2px dashed #667eea;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-uploader input[type="file"]:hover {
+  border-color: #764ba2;
+  background: #f8f9ff;
+}
+
+.file-uploader p {
+  margin-top: 15px;
+  color: #666;
+}
+
+.file-uploader p strong {
+  color: #667eea;
+}
+
+.supported-formats {
+  font-size: 0.9rem;
+  color: #999;
+  margin-top: 10px;
+}
+
+/* Loading & Error */
+.loading, .error {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.loading {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Document Viewer */
+.document-viewer {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: 400px;
+}
+
+.document-viewer.empty {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 15px 0;
-  border-bottom: 1px solid #eee; /* Đường kẻ mờ ngăn cách */
+  justify-content: center;
+  color: #999;
+  font-style: italic;
 }
 
-.todo-text {
-  flex: 1;
-  font-size: 16px;
+.document-viewer h2 {
   color: #333;
-  margin-right: 10px;
-  cursor: pointer;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #667eea;
 }
 
-/* 5. Style chung cho các nút bấm */
-button {
-  cursor: pointer;
+/* Word Content */
+.word-content {
+  line-height: 1.8;
+  color: #333;
+}
+
+.word-content p {
+  margin-bottom: 15px;
+}
+
+.word-content h1, .word-content h2, .word-content h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #667eea;
+}
+
+/* Excel Content */
+.excel-content {
+  overflow-x: auto;
+}
+
+.excel-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.excel-content th, .excel-content td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.excel-content th {
+  background: #667eea;
+  color: white;
+  font-weight: bold;
+}
+
+.excel-content tr:nth-child(even) {
+  background: #f8f9ff;
+}
+
+.excel-content h3 {
+  color: #667eea;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+/* PDF Toolbar */
+.pdf-toolbar {
+  background: #f5f5f5;
+  padding: 15px 30px;
+  border-radius: 10px;
+  max-width: 900px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-toolbar button {
   padding: 8px 16px;
+  background: #667eea;
+  color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 5px;
+  cursor: pointer;
   font-weight: 500;
-  transition: opacity 0.2s;
+  transition: all 0.3s ease;
 }
 
-button:hover {
-  opacity: 0.8;
+.pdf-toolbar button:hover:not(:disabled) {
+  background: #764ba2;
+  transform: translateY(-1px);
 }
 
-/* Màu từng loại nút */
-.btn-add {
-  background-color: #4a90e2; /* Xanh dương */
-  color: white;
-  padding: 12px 20px;
-  font-size: 16px;
+.pdf-toolbar button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
-.btn-toggle {
-  background-color: #e2e6ea; /* Xám nhạt */
+.pdf-toolbar .page-info {
+  font-weight: bold;
   color: #333;
-  margin-right: 8px;
+  min-width: 120px;
+  text-align: center;
 }
 
-.btn-delete {
-  background-color: #ff4d4f; /* Đỏ */
-  color: white;
+.zoom-controls {
+  display: flex;
+  gap: 5px;
+  margin-left: 20px;
+  border-left: 2px solid #ddd;
+  padding-left: 20px;
+}
+
+.zoom-controls button {
+  width: 40px;
+  padding: 8px;
+}
+
+/* PDF Viewer Container */
+.pdf-viewer-container {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+  max-height: 80vh;
+}
+
+.pdf-viewer-container .react-pdf__Document {
+  display: flex;
+  justify-content: center;
+}
+
+.pdf-viewer-container .react-pdf__Page {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  margin: 10px 0;
+}
+
+.pdf-viewer-container canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* PDF Content */
+.pdf-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.pdf-content .react-pdf__Page {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.pdf-content canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 2rem;
+  }
+  
+  .file-uploader, .document-viewer {
+    padding: 20px;
+  }
 }

@@ -1,53 +1,133 @@
-// src/App.jsx
-import { useState, useEffect } from "react";
-import TodoInput from "./TodoInput"; // Import con vào
-import TodoList from "./TodoList";   // Import con vào
+import { useState } from 'react';
+import './App.css';
+import FileUploader from './FileUploader';
+import DocumentViewer from './DocumentViewer';
+import { parseWordFile, parseExcelFile, parsePDFFile } from './fileParser';
+import { Document, Page } from 'react-pdf';
 
 function App() {
-  // --- 1. STATE & EFFECT (Giữ nguyên) ---
-  const [todos, setTodos] = useState(() => {
-    const storedTodos = localStorage.getItem("todos");
-    return storedTodos ? JSON.parse(storedTodos) : [];
-  });
+  const [content, setContent] = useState(null);
+  const [fileType, setFileType] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [numPages, setNumPages] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [scale, setScale] = useState(1.0);
 
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
-
-  // --- 2. LOGIC HANDLERS (Xử lý nghiệp vụ) ---
-  
-  // Hàm này giờ chỉ nhận text từ con, không cần lo về input state nữa
-  const handleAdd = (text) => {
-    const newTodo = { id: Date.now(), title: text, completed: false };
-    setTodos([...todos, newTodo]);
+  const handleFileSelect = async (file) => {
+    setLoading(true);
+    setError(null);
+    setContent(null);
+    
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    try {
+      if (fileExtension === 'docx') {
+        const result = await parseWordFile(file);
+        if (result.success) {
+          setContent(result.html);
+          setFileType('word');
+        } else {
+          setError(result.error);
+        }
+      } 
+      else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+        const result = await parseExcelFile(file);
+        if (result.success) {
+          // Display all sheets
+          const allSheets = result.sheetNames.map(name => (
+            `<h3>${name}</h3>${result.sheets[name]}`
+          )).join('');
+          setContent(<div dangerouslySetInnerHTML={{ __html: allSheets }} />);
+          setFileType('excel');
+        } else {
+          setError(result.error);
+        }
+      } 
+      else if (fileExtension === 'pdf') {
+        const result = await parsePDFFile(file);
+        if (result.success) {
+          setContent(result.fileUrl);
+          setFileType('pdf');
+          setPageNumber(1);
+        } else {
+          setError(result.error);
+        }
+      } 
+      else {
+        setError('Định dạng file không được hỗ trợ');
+      }
+    } catch (err) {
+      setError('Lỗi khi xử lý file: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const goToPrevPage = () => {
+    setPageNumber(prev => Math.max(prev - 1, 1));
   };
 
-  const handleToggle = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
+  const goToNextPage = () => {
+    setPageNumber(prev => Math.min(prev + 1, numPages || prev));
   };
 
-  // --- 3. RENDER (Giao diện gọn gàng) ---
+  const zoomIn = () => {
+    setScale(prev => Math.min(prev + 0.2, 3.0));
+  };
+
+  const zoomOut = () => {
+    setScale(prev => Math.max(prev - 0.2, 0.5));
+  };
+
+  const resetZoom = () => {
+    setScale(1.0);
+  };
+
   return (
-    <div className="App" style={{ padding: 20 }}>
-      <h1>Danh sách công việc (Refactored)</h1>
+    <div className="App">
+      <header>
+        <h1>📄 Trình Đọc Tài Liệu</h1>
+        <p>Hỗ trợ Word, Excel, và PDF</p>
+      </header>
       
-      {/* Truyền hàm thêm xuống cho con */}
-      <TodoInput onAdd={handleAdd} />
-
-      {/* Truyền dữ liệu và hàm xử lý xuống cho con */}
-      <TodoList 
-        todos={todos} 
-        onDelete={handleDelete} 
-        onToggle={handleToggle} 
-      />
+      <FileUploader onFileSelect={handleFileSelect} />
+      
+      {loading && <div className="loading">Đang xử lý file...</div>}
+      {error && <div className="error">Lỗi: {error}</div>}
+      
+      {fileType === 'pdf' && content && (
+        <div className="pdf-toolbar">
+          <button onClick={goToPrevPage} disabled={pageNumber <= 1}>
+            ◀ Trang trước
+          </button>
+          <span className="page-info">
+            Trang {pageNumber} / {numPages || '...'}
+          </span>
+          <button onClick={goToNextPage} disabled={pageNumber >= numPages}>
+            Trang sau ▶
+          </button>
+          <div className="zoom-controls">
+            <button onClick={zoomOut}>−</button>
+            <button onClick={resetZoom}>{Math.round(scale * 100)}%</button>
+            <button onClick={zoomIn}>+</button>
+          </div>
+        </div>
+      )}
+      
+      {fileType === 'pdf' && content ? (
+        <div className="pdf-viewer-container">
+          <Document
+            file={content}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            onLoadError={(error) => setError('Lỗi khi tải PDF: ' + error.message)}
+          >
+            <Page pageNumber={pageNumber} scale={scale} />
+          </Document>
+        </div>
+      ) : (
+        <DocumentViewer content={content} fileType={fileType} />
+      )}
     </div>
   );
 }
