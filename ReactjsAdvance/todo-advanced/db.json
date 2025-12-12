@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "email": "hkkhanhpro@gmail.com",
+      "password": "$2a$10$AEujKGX1Y4xUzncitdYzNuHeS/B0YZ2cytKB7thDE.x1gnikm1TaO",
+      "name": "tranduykhanh",
+      "id": 1
+    }
+  ],
+  "todos": []
+}
